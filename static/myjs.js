@@ -60,6 +60,8 @@ function post() {
             let time_post = new Date(post["date"]);
             let time_before = time2str(time_post);
             let class_heart = post["heart_by_me"] ? "fa-heart" : "fa-heart-o";
+            let class_star = post["star_by_me"] ? "fa-star" : "fa-star-o";
+            let class_thumbsup = post["thumbsup_by_me"] ? "fa-thumbs-up" : "fa-thumbs-o-up";
             let html_temp = `<div class="box" id="${post["_id"]}">
                                           <article class="media">
                                               <div class="media-left">
@@ -90,11 +92,22 @@ function post() {
                                                             post["_id"]
                                                           }', 'heart')">
                                                               <span class="icon is-small"><i class="fa ${class_heart}"
-                                                                                             aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(
-                                                                                               post[
-                                                                                                 "count_heart"
-                                                                                               ]
-                                                                                             )}</span>
+                                                                aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(
+                                                                 post["count_heart"] )}</span>
+                                                          </a>
+                                                          <a class="level-item is-sparta" aria-label="star" onclick="toggle_star('${
+                                                            post["_id"]
+                                                          }', 'star')">
+                                                              <span class="icon is-small"><i class="fa ${class_star}"
+                                                                aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(
+                                                                 post["count_star"] )}</span>
+                                                          </a>
+                                                          <a class="level-item is-sparta" aria-label="thumbsup" onclick="toggle_thumbsup('${
+                                                            post["_id"]
+                                                          }', 'thumbsup')">
+                                                              <span class="icon is-small"><i class="fa ${class_thumbsup}"
+                                                                aria-hidden="true"></i></span>&nbsp;<span class="like-num">${num2str(
+                                                                 post["count_thumbsup"] )}</span>
                                                           </a>
                                                       </div>
   
@@ -144,6 +157,80 @@ function post() {
       });
     }
   }
+  
+function toggle_star(post_id, type) {
+    console.log(post_id, type);
+    let $a_like = $(`#${post_id} a[aria-label='star']`);
+    let $i_like = $a_like.find("i");
+    if ($i_like.hasClass("fa-star")) {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "unlike",
+        },
+        success: function (response) {
+          console.log("unlike");
+          $i_like.addClass("fa-star-o").removeClass("fa-star");
+          $a_like.find("span.like-num").text(num2str(response["count"]));
+        },
+      });
+    } else {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "like",
+        },
+        success: function (response) {
+          console.log("like");
+          $i_like.addClass("fa-star").removeClass("fa-star-o");
+          $a_like.find("span.like-num").text(num2str(response["count"]));
+        },
+      });
+    }
+  }
+function toggle_thumbsup(post_id, type) {
+    console.log(post_id, type);
+    let $a_like = $(`#${post_id} a[aria-label='thumbsup']`);
+    let $i_like = $a_like.find("i");
+    if ($i_like.hasClass("fa-thumbs-up")) {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "unlike",
+        },
+        success: function (response) {
+          console.log("unlike");
+          $i_like.addClass("fa-thumbs-o-up").removeClass("fa-thumbs-up");
+          $a_like.find("span.like-num").text(num2str(response["count"]));
+        },
+      });
+    } else {
+      $.ajax({
+        type: "POST",
+        url: "/update_like",
+        data: {
+          post_id_give: post_id,
+          type_give: type,
+          action_give: "like",
+        },
+        success: function (response) {
+          console.log("like");
+          $i_like.addClass("fa-thumbs-up").removeClass("fa-thumbs-o-up");
+          $a_like.find("span.like-num").text(num2str(response["count"]));
+        },
+      });
+    }
+  }
+  
   
   function sign_out() {
     $.removeCookie("mytoken", { path: "/" });
